@@ -1,0 +1,16 @@
+name: .venv
+channels:
+  - conda-forge
+dependencies:
+  - python==3.10.8
+  - jupyterlab
+  - catppuccin-jupyterlab
+  - nltk
+  - numpy
+  - scikit-learn
+  - pandas
+  - matplotlib
+  - flask
+  - protobuf==3.19.6
+  - altair==4.0
+prefix: /home/nipuran/miniforge3/envs/.venv
