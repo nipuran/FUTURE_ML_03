@@ -1,0 +1,124 @@
+body {
+    background: #23232d;
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+}
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+.sidebar {
+    background: #191932;
+    padding: 28px 18px;
+    width: 250px;
+    box-shadow: 2px 0 12px #18182133;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+.sidebar h2 {
+    margin: 0 0 10px 0;
+    color: #c7b5fa;
+    font-size: 1.3em;
+}
+.sidebar label {
+    color: #c7b5fa;
+    font-size: 1em;
+    margin-bottom: 10px;
+    display: block;
+}
+.sidebar select {
+    width: 100%;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: 1px solid #3c3578;
+    padding: 5px;
+    background: #282842;
+    color: #fff;
+}
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 35px 8vw 0 8vw;
+}
+.chat-main h1 {
+    margin-bottom: 20px;
+    color: #c7b5fa;
+}
+#chat-box {
+    flex: 1;
+    overflow-y: auto;
+    background: #242441;
+    border-radius: 16px;
+    padding: 18px 18px 0 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 28px #0002;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+}
+.bubble-user {
+    background: #2f295d;
+    color: #c7b5fa;
+    border-radius: 12px 12px 3px 12px;
+    padding: 12px 16px;
+    margin: 4px 0;
+    max-width: 70%;
+    align-self: flex-end;
+}
+.bubble-bot {
+    background: #23232d;
+    color: #f5e0dc;
+    border-radius: 12px 12px 12px 3px;
+    padding: 12px 16px;
+    margin: 4px 0;
+    max-width: 70%;
+    align-self: flex-start;
+}
+.chat-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+.chat-row.user {
+    justify-content: flex-end;
+}
+.input-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #23232d;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 10px #0003;
+}
+.input-area textarea {
+    flex: 1;
+    font-size: 1.12rem;
+    border-radius: 8px;
+    border: 1px solid #3c3578;
+    background: #282842;
+    color: #fff;
+    padding: 10px;
+    min-height: 48px;
+    resize: none;
+}
+.input-area button {
+    background: #c7b5fa;
+    color: #23232d;
+    border: none;
+    border-radius: 7px;
+    font-size: 1.07rem;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.16s;
+}
+.input-area button:hover {
+    background: #ffffa9;
+    color: #2f295d;
+}
+

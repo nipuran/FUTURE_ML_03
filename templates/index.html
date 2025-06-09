@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Customer Support Chatbot</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+	<div class="container">
+		<aside class="sidebar">
+			<h2>🛒 Ticket Information</h2>
+			<label>Product Name
+				<select id="product">
+					{% for prod in products %}
+					<option>{{ prod }}</option>
+					{% endfor %}
+				</select>
+			</label>
+
+			<!-- Updated Ticket Type list -->
+			<label>Ticket Type
+				<select id="ticket_type">
+					<option disabled selected value="">Select Type</option>
+					<option>Refund request</option>
+					<option>Technical issue</option>
+					<option>Cancellation request</option>
+					<option>Product inquiry</option>
+					<option>Billing inquiry</option>
+				</select>
+			</label>
+
+			<!-- Subject dropdown starts empty; JS populates it based on the above type -->
+			<label>Ticket Subject
+				<select id="ticket_subject" disabled>
+					<option disabled selected value="">Select Subject</option>
+				</select>
+			</label>
+		</aside>
+
+		<main class="chat-main">
+			<h1>Customer Support Chatbot</h1>
+			<div id="chat-box">
+				<div class="chat-row bot">
+					<div class="bubble-bot">
+						Hello! Welcome to customer support.<br>
+						Please select your product, ticket type, and subject, then describe your issue.<br>
+						You can also <strong>Cancel Chat</strong> or <strong>Call Customer Care</strong> at any time.
+					</div>
+				</div>
+			</div>
+
+			<div class="input-area">
+				<textarea id="user_msg" placeholder="Type your problem here..."></textarea>
+				<button id="send-btn">Send</button>
+				<button id="cancel-btn">Cancel Chat</button>
+				<button id="call-btn">Call Customer Care</button>
+			</div>
+		</main>
+	</div>
+
+	<script>
+		const chatBox = document.getElementById('chat-box');
+		const sendBtn = document.getElementById('send-btn');
+		const cancelBtn = document.getElementById('cancel-btn');
+		const callBtn = document.getElementById('call-btn');
+		const userMsgInput = document.getElementById('user_msg');
+
+		const ticketTypeSelect = document.getElementById('ticket_type');
+		const ticketSubjectSelect = document.getElementById('ticket_subject');
+
+		// “Ticket Subjects” mapped to each “Ticket Type” (using your provided lists)
+		const subjectOptions = {
+			"Refund request": [
+				"Refund request"
+			],
+			"Technical issue": [
+				"Software bug",
+				"Hardware issue",
+				"Battery life",
+				"Network problem",
+				"Display issue",
+				"Data loss"
+			],
+			"Cancellation request": [
+				"Cancellation request"
+			],
+			"Product inquiry": [
+				"Product compatibility",
+				"Product recommendation",
+				"Installation support",
+				"Product setup",
+				"Peripheral compatibility",
+				"Account access"
+			],
+			"Billing inquiry": [
+				"Payment issue",
+				"Delivery problem"
+			]
+		};
+
+		function populateSubjects() {
+			const selectedType = ticketTypeSelect.value;
+			ticketSubjectSelect.innerHTML = '<option disabled selected value="">Select Subject</option>';
+
+			if (subjectOptions[selectedType]) {
+				subjectOptions[selectedType].forEach(subj => {
+					const opt = document.createElement('option');
+					opt.value = subj;
+					opt.textContent = subj;
+					ticketSubjectSelect.appendChild(opt);
+				});
+				ticketSubjectSelect.disabled = false;
+			} else {
+				ticketSubjectSelect.disabled = true;
+			}
+		}
+
+		ticketTypeSelect.addEventListener('change', populateSubjects);
+
+		function addMessage(role, msg) {
+			const msgDiv = document.createElement('div');
+			msgDiv.className = 'chat-row ' + (role === 'user' ? 'user' : 'bot');
+			msgDiv.innerHTML = `<div class="bubble-${role}">${msg}</div>`;
+			chatBox.appendChild(msgDiv);
+			chatBox.scrollTop = chatBox.scrollHeight;
+		}
+
+		sendBtn.onclick = async function() {
+			const userMsg = userMsgInput.value.trim();
+			const product = document.getElementById('product').value;
+			const ticketType = ticketTypeSelect.value;
+			const ticketSubject = ticketSubjectSelect.value;
+
+			if (!userMsg || !product || !ticketType || !ticketSubject) {
+				addMessage('bot', 'Please select Product, Ticket Type, Ticket Subject, and enter your message.');
+				return;
+			}
+
+			addMessage('user', userMsg);
+			userMsgInput.value = '';
+			addMessage('bot', '<em>Support bot is typing...</em>');
+
+			const payload = {
+				product: product,
+				ticket_type: ticketType,
+				ticket_subject: ticketSubject,
+				message: userMsg
+			};
+
+			try {
+				const res = await fetch('/chat', {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(payload)
+				});
+
+				if (!res.ok) {
+					throw new Error(`Server responded with ${res.status}`);
+				}
+
+				const data = await res.json();				
+				chatBox.removeChild(chatBox.lastChild);
+				addMessage(
+					'bot',
+					data.answer
+					.replace(/\n/g, '<br>')
+					.replace(/\* /g, '• ')
+				);
+
+				if (Array.isArray(data.follow_up_questions) && data.follow_up_questions.length) {
+					addMessage('bot', '<em>Possible follow-up questions:</em>');
+
+					data.follow_up_questions.forEach(item => {
+						let text;
+						if (item && typeof item === 'object' && 'question' in item) {
+							text = item.question;
+						} else {
+							text = item;
+						}
+						addMessage('bot', text);
+					});
+				}
+			} catch (err) {
+				chatBox.removeChild(chatBox.lastChild);
+				console.error(err);
+				addMessage('bot', "Sorry, something went wrong.");
+			}
+		};
+
+
+		cancelBtn.onclick = function() {
+			chatBox.innerHTML = '';
+			addMessage('bot',
+				'Chat has been cancelled. If you need further help, feel free to start over or <strong>Call Customer Care</strong>.'
+			);
+		};
+
+		callBtn.onclick = function() {
+			addMessage('bot', 'You can reach Customer Care at <strong>1800-XXX-XXXX</strong>.');
+		};
+
+		userMsgInput.addEventListener("keydown", function(e) {
+			if (e.key === "Enter" && !e.shiftKey) {
+				e.preventDefault();
+				sendBtn.click();
+			}
+		});
+	</script>
+</body>
+</html>
+
