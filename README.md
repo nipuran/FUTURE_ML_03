@@ -4,7 +4,7 @@ Customer support chatbot powered by Groq AI.
 
 ## Table of Contents
 - [Installation Guide](#installation-guide)
-- [App Image](#App Image)
+- [App Image](#app-image)
 
 ## Installation Guide
 ### 1. Clone the Repository
